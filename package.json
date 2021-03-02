@@ -1,0 +1,27 @@
+{
+  "name": "autobase-twitter",
+  "version": "1.0.0",
+  "description": "aplikasi twitter autobase ",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akhmadkhasan68/autobase-twitter.git"
+  },
+  "author": "hasan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akhmadkhasan68/autobase-twitter/issues"
+  },
+  "homepage": "https://github.com/akhmadkhasan68/autobase-twitter#readme",
+  "keywords": [
+    "autobase",
+    "twitter"
+  ],
+  "dependencies": {
+    "express": "^4.17.1",
+    "twit": "^2.2.11"
+  }
+}
