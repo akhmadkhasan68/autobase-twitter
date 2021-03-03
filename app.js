@@ -1,6 +1,7 @@
-var config = require('./config');
-var express = require('express');
-var app = express();
+const config = require('./config');
+const express = require('express');
+const CronJob = require('cron').CronJob;
+const app = express();
 const _port = 8000;
 
 const { TwitterBot } = require('./twitter-bot');
@@ -10,6 +11,17 @@ const twitterbot = new TwitterBot({
     access_token: config.access_token,
     access_token_secret: config.access_token_secret,
 });
+
+const job = new CronJob(
+    '*/1 * * * * *',
+    doJob,
+    null,
+    true
+);
+
+function doJob(){
+    console.log('onclick!');
+};
 
 // app.get('/adminProfile', async (req, res, next) => {
 //     const admin = await twitterbot.getAdminUserInfo();
