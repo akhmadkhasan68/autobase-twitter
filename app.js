@@ -5,7 +5,7 @@ const app = express();
 const _port = 8000;
 
 const { TwitterBot } = require('./twitter-bot');
-const twitterbot = new TwitterBot({
+const bot = new TwitterBot({
     consumer_key: config.consumer_key,
     consumer_secret: config.consumer_secret,
     access_token: config.access_token,
@@ -16,21 +16,22 @@ const job = new CronJob(
     '*/1 * * * * *',
     doJob,
     null,
-    true
+    false
 );
 
-function doJob(){
-    console.log('onclick!');
+async function doJob(){
+    const authenticatedProfile = await bot.getAdminUserInfo();
+    const admin_id = authenticatedProfile.data.id_str;
+    const dm = await bot.getDirectMessage(admin_id);
+    for(const message of dm)
+    {
+        console.log(message.message_create);
+    }
 };
 
-// app.get('/adminProfile', async (req, res, next) => {
-//     const admin = await twitterbot.getAdminUserInfo();
-//     res.json(admin);
-// });
-
-app.get('/adminProfile', async (req, res, next) => {
-    const admin = await twitterbot.getAdminUserInfo();
-    res.json(admin);
+app.get('/trigger', async (req, res, next) => {
+    job.fireOnTick();
+    res.json('halo');
 });
 
 app.listen(_port, () => { console.log(`runnig on port ${_port}`) });

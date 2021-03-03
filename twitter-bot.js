@@ -23,6 +23,28 @@ class TwitterBot {
         });
 
     }
+
+    getReciveMessage = (messages, admin_id) => {
+        return messages.filter(msg => msg.message_create.sender_id !== admin_id);
+    }
+
+    getDirectMessage = (admin_id) => {
+        return new Promise((resolve, reject) => {
+            this.T.get('direct_messages/events/list', (error, data) => {
+                if(error)
+                {
+                    reject(error);
+                }
+                else
+                {
+                    const messages = data.events;
+                    const reciveMessage = this.getReciveMessage(messages, admin_id);
+                    console.log(reciveMessage);
+                    resolve(reciveMessage);
+                }
+            });
+        });
+    }
 }
 
 module.exports = { TwitterBot };
