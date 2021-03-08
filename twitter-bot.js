@@ -60,7 +60,7 @@ class TwitterBot {
 
     getDirectMessage = (admin_id) => {
         return new Promise((resolve, reject) => {
-            this.T.get('direct_messages/events/list', (error, data) => {
+            this.T.get('direct_messages/events/list', async (error, data) => {
                 if(error)
                 {
                     reject(error);
@@ -71,11 +71,57 @@ class TwitterBot {
                     const reciveMessage = this.getReciveMessage(messages, admin_id);
                     const unnecessaryMessages = this.getUnnecessaryMessages(reciveMessage, this.triggerWord);
                     const triggerMessages = this.getTriggerMessages(reciveMessage, this.triggerWord);
-                    console.log(JSON.stringify(triggerMessages, null, 3), 'triiger msg<<');
+                    // console.log(JSON.stringify(triggerMessages, null, 3), 'triiger msg<<');
+
+                    await this.deleteUnnecessaryMessages(unnecessaryMessages);
+                    
+                    resolve(data);
                 }
             });
         });
     }
+
+    deleteUnnecessaryMessages = async (unnecessaryMessages) => {
+        if(unnecessaryMessages.length > 3)
+        {
+            for(let i = 0; i < 3; i++)
+            {
+                await this.deleteMessage(unnecessaryMessages[i]);
+                await this.sleep(2000);
+            }
+        }
+        else
+        {
+            for(const msg of unnecessaryMessages)
+            {
+                await this.deleteMessage(msg);
+                await this.sleep(2000);
+            }
+        }
+    };
+
+    deleteMessage = (message) => {
+        return new Promise((resolve, reject) => {
+            this.T.delete('direct_messages/event/destroy', {id: message.id}, (error, data) => {
+                if(!error)
+                {
+                    const msg = `Message with id ${message.id} has been successfuly deleted!`;
+                    console.log(msg);
+                    resolve({
+                        message: msg,
+                        data
+                    });
+                }
+                else
+                {
+                    reject(error);
+                }
+            });
+        });
+    };
+
+    sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
+    
 }
 
 module.exports = { TwitterBot };
