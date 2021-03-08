@@ -9,6 +9,8 @@ class TwitterBot {
             access_token: props.access_token,
             access_token_secret: props.access_token_secret,
         });
+
+        this.triggerWord = props.triggerWord;
     }
 
     getAdminUserInfo = () => {
@@ -28,6 +30,34 @@ class TwitterBot {
         return messages.filter(msg => msg.message_create.sender_id !== admin_id);
     }
 
+    getUnnecessaryMessages = (reciveMessage, trigger) => {
+        return reciveMessage.filter(msg => {
+            const message = msg.message_create.message_data.text;
+            const words = this.getEachWord(message);
+            return !words.includes(trigger);
+        });
+    }
+
+    getTriggerMessages = (reciveMessage, trigger) => {
+        return reciveMessage.filter(msg => {
+            const message = msg.message_create.message_data.text;
+            const words = this.getEachWord(message);
+            return words.includes(trigger);
+        });
+    }
+
+    getEachWord = (message) => {
+        let words = [];
+        let finalWords = [];
+        const separatorEnter = message.split('\n');
+        separatorEnter.forEach(line => words = [...words, ...line.split(' ')]);
+        words.forEach(word => {
+            const splitComma = word.split(',');
+            finalWords = [...finalWords, ...splitComma];
+        });
+        return finalWords;
+    }
+
     getDirectMessage = (admin_id) => {
         return new Promise((resolve, reject) => {
             this.T.get('direct_messages/events/list', (error, data) => {
@@ -39,8 +69,9 @@ class TwitterBot {
                 {
                     const messages = data.events;
                     const reciveMessage = this.getReciveMessage(messages, admin_id);
-                    console.log(reciveMessage);
-                    resolve(reciveMessage);
+                    const unnecessaryMessages = this.getUnnecessaryMessages(reciveMessage, this.triggerWord);
+                    const triggerMessages = this.getTriggerMessages(reciveMessage, this.triggerWord);
+                    console.log(JSON.stringify(triggerMessages, null, 3), 'triiger msg<<');
                 }
             });
         });

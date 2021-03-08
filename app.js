@@ -10,6 +10,7 @@ const bot = new TwitterBot({
     consumer_secret: config.consumer_secret,
     access_token: config.access_token,
     access_token_secret: config.access_token_secret,
+    triggerWord: 'oh'
 });
 
 const job = new CronJob(
@@ -23,10 +24,10 @@ async function doJob(){
     const authenticatedProfile = await bot.getAdminUserInfo();
     const admin_id = authenticatedProfile.data.id_str;
     const dm = await bot.getDirectMessage(admin_id);
-    for(const message of dm)
-    {
-        console.log(message.message_create);
-    }
+    // for(const message of dm)
+    // {
+    //     console.log(message.message_create);
+    // }
 };
 
 app.get('/trigger', async (req, res, next) => {
